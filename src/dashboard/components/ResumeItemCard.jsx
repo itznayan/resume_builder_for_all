@@ -29,7 +29,7 @@ const ResumeItemCard = ({ resume, refreshData }) => {
 
   const handleDelete = () => {
     GlobalApi.DeleteResumeById(resume.id).then((resp) => {
-      console.log(resp);
+      // console.log(resp);
       toast("Resume deleted successfully");
       setAlert(false);
       refreshData();
@@ -48,7 +48,7 @@ const ResumeItemCard = ({ resume, refreshData }) => {
       </Link>
       <div className="flex justify-between px-2">
         <Link to={"/dashboard/resume/" + resume.id + "/edit"}>
-          <h2 className="px-4 text-center">{resume.attributes.title}</h2>
+          <h2 className="px-4 text-center">{resume.data.title}</h2>
         </Link>
 
         <DropdownMenu>

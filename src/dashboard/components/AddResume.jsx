@@ -13,7 +13,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import GlobalApi from "../../../service/GlobalApi";
-import { useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 
 const AddResume = () => {
@@ -21,7 +20,6 @@ const AddResume = () => {
   const [resumeTitle, setResumeTitle] = useState();
   const [loading, setLoading] = useState(false);
   const navigation = useNavigate();
-  const { user } = useUser();
 
   const onCreate = () => {
     setLoading(true);
@@ -29,10 +27,10 @@ const AddResume = () => {
 
     const data = {
       data: {
-        title: resumeTitle,
+        title: resumeTitle || "Untitled Resume",
         resumeId: uuid,
-        userEmail: user?.primaryEmailAddress?.emailAddress,
-        userName: user?.fullName,
+        userEmail: "local@user.com", // Default email for local storage
+        userName: "Local User", // Default user name
       },
     };
     GlobalApi.CreateNewResume(data).then(

@@ -2,21 +2,14 @@ import { Input } from "@/components/ui/input";
 import { ResumeInfoContext } from "@/context/ResumeInfoContext";
 import { Button } from "../../../../components/ui/button";
 import { useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import GlobalApi from "../../../../../service/GlobalApi";
 import { LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
+import PropTypes from "prop-types";
 
 const PersonalDetail = ({ isNext }) => {
   const { resumeInfo, setResumeInfo } = useContext(ResumeInfoContext);
-  const params = useParams();
   const [formData, setFormData] = useState();
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    // console.log(params.resumeId);
-  }, []);
-  console.log();
   const handleInputChange = (e) => {
     isNext(false);
     const { name, value } = e.target;
@@ -35,21 +28,13 @@ const PersonalDetail = ({ isNext }) => {
   const handleSave = (e) => {
     e.preventDefault();
     setLoading(true);
-    const data = {
-      data: formData,
-    };
 
-    GlobalApi.UpdateResumeDetail(params?.resumeId, data).then(
-      (resp) => {
-        // console.log(resp);
-        isNext(true);
-        setLoading(false);
-        toast("Personal detail added successfully.");
-      },
-      (error) => {
-        setLoading(false);
-      }
-    );
+    // Data is already saved via context auto-save
+    setTimeout(() => {
+      isNext(true);
+      setLoading(false);
+      toast("Personal detail added successfully.");
+    }, 500);
   };
 
   return (
@@ -146,6 +131,10 @@ const PersonalDetail = ({ isNext }) => {
       </form>
     </div>
   );
+};
+
+PersonalDetail.propTypes = {
+  isNext: PropTypes.func.isRequired,
 };
 
 export default PersonalDetail;

@@ -1,10 +1,8 @@
 import { Button } from "../button";
 import { Link } from "react-router-dom";
-import { UserButton, useUser } from "@clerk/clerk-react";
 import logo from "../../../../public/logo.png";
-const Header = () => {
-  const { user, isSignedIn } = useUser();
 
+const Header = () => {
   return (
     <div className="px-14 py-4 rounded-b-full flex justify-between shadow-lg">
       <Link to="/">
@@ -16,20 +14,14 @@ const Header = () => {
           height={100}
         />
       </Link>
-      {isSignedIn ? (
-        <div className="flex gap-2 items-center">
-          <Link to={"/dashboard"}>
-            <Button>Dashboard</Button>
-          </Link>
-          <div className="bg-gray-200 flex justify-center items-center p-[3px] rounded-full">
-            <UserButton />
-          </div>
-        </div>
-      ) : (
-        <Link to={"./auth/sign-in"}>
-          <Button>Get Started</Button>
+      <div className="flex gap-2 items-center">
+        <Link to={"/dashboard"}>
+          <Button>Dashboard</Button>
         </Link>
-      )}
+        <Link to={"/"}>
+          <Button variant="outline">Home</Button>
+        </Link>
+      </div>
     </div>
   );
 };

@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* hide rating stars in print */
+
+
 @media print {
   #no-print {
     display: none;
@@ -9,6 +12,25 @@
 
   #print-area {
     display: block;
+  }
+
+  .rating {
+    display: none !important;
+  }
+
+  .rating-print {
+    display: block !important;
+  }
+
+  @media print {
+    * {
+      -webkit-print-color-adjust: exact !important;
+      /* Safari/Chrome */
+      print-color-adjust: exact !important;
+      /* Standard */
+      color-adjust: exact !important;
+      /* Firefox */
+    }
   }
 
   body {

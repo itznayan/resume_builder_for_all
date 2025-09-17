@@ -47,7 +47,7 @@ const RichTextEditor = ({ onRichTextEditorChange, index, defaultValue }) => {
 
     //const resp = JSON.parse(result.response.text());
 
-    console.log(resp);
+    // console.log(resp);
     // const respd = resp.experience[0] + resp.experience[1] + resp.experience[2];
     // setValue(resp.replace("[", "").replace("]", ""));
     setLoading(false);

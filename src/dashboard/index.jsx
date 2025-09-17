@@ -1,4 +1,3 @@
-import { useUser } from "@clerk/clerk-react";
 import AddResume from "./components/AddResume";
 import { motion } from "framer-motion";
 import GlobalApi from "../../service/GlobalApi";
@@ -7,20 +6,15 @@ import ResumeItemCard from "./components/ResumeItemCard";
 
 const Dashboard = () => {
   const [resumeList, setResumeList] = useState([]);
-  const { user } = useUser();
 
   useEffect(() => {
-    if (user) {
-      GetResumesList();
-    }
-  }, [user]);
+    GetResumesList();
+  }, []);
 
   const GetResumesList = () => {
-    GlobalApi.GetUserResumes(user?.primaryEmailAddress?.emailAddress).then(
-      (resp) => {
-        setResumeList(resp.data.data);
-      }
-    );
+    GlobalApi.GetUserResumes().then((resp) => {
+      setResumeList(resp.data.data);
+    });
   };
 
   const Animate = {
@@ -40,7 +34,7 @@ const Dashboard = () => {
         initial="initial"
         animate="animate"
         transition={{ delay: 0.3 }}
-        className="font-semibold text-3xl font-bold"
+        className="text-3xl font-bold"
       >
         My Resume
       </motion.h2>

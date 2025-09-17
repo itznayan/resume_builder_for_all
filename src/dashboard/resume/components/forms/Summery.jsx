@@ -1,30 +1,31 @@
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "../../../../components/ui/button";
-import React, { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import { ResumeInfoContext } from "@/context/ResumeInfoContext";
-import { useParams } from "react-router-dom";
-import GlobalApi from "../../../../../service/GlobalApi";
 import { Brain, LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
 import { AIChatSession } from "../../../../../service/AIModal";
+import PropTypes from "prop-types";
 
 const Summery = ({ isNext }) => {
   const { resumeInfo, setResumeInfo } = useContext(ResumeInfoContext);
   const [summery, setSummery] = useState();
   const [loading, setLoading] = useState(false);
-  const params = useParams();
-  // console.log(resumeInfo);
-  const [aiGenSummery, setAiGenSummery] = useState();
+  const [aiGenSummery, setAiGenSummery] = useState([]); // ✅ default empty array
+  const jobTitle = resumeInfo.jobTitle;
+  console.log(jobTitle);
   const prompt =
-    "Job Title: {jobTitle} , Depends on job title give me list of  summery for 3 experience level, Mid Level and Fresher level in 3 -4 lines in array format, With summery and experience_level Field in JSON Format";
+    'Job Title: {jobTitle}, give me a JSON array of 3 summaries (Fresher, Mid Level, Experienced). Each object should have fields: experience_level and summary. Example: [{"experience_level":"Fresher","summary":"..."}]';
 
   useEffect(() => {
-    summery &&
+    if (summery) {
       setResumeInfo({
         ...resumeInfo,
         summery: summery,
       });
-  }, [summery]);
+    }
+  }, [summery, resumeInfo, setResumeInfo]);
+  console.log(aiGenSummery);
 
   const GenerateSummeryFromAI = async () => {
     setLoading(true);
@@ -35,28 +36,16 @@ const Summery = ({ isNext }) => {
     setAiGenSummery(JSON.parse(result.response.text()));
     setLoading(false);
   };
-
   const handleSave = (e) => {
     e.preventDefault();
-    // console.log("preventDefault active")
     setLoading(true);
-    const data = {
-      data: {
-        summery: summery,
-      },
-    };
 
-    GlobalApi.UpdateResumeDetail(params?.resumeId, data).then(
-      (resp) => {
-        // console.log(resp);
-        isNext(true);
-        setLoading(false);
-        toast("Summery added successfully.");
-      },
-      (error) => {
-        setLoading(false);
-      }
-    );
+    // Data is already saved via context auto-save
+    setTimeout(() => {
+      isNext(true);
+      setLoading(false);
+      toast("Summery added successfully.");
+    }, 500);
   };
 
   return (
@@ -69,13 +58,13 @@ const Summery = ({ isNext }) => {
           <div className="flex  items-end justify-between">
             <label htmlFor="">Add Summery</label>
             <Button
-              onClick={() => GenerateSummeryFromAI()}
+              onClick={GenerateSummeryFromAI}
               type="button"
               variant="outline"
               size="sm"
               className="border-black hover:bg-black hover:text-white duration-300 bg-gray-100 gap-2"
             >
-              <Brain className="size-5" /> Generate form AI
+              <Brain className="size-5" /> Generate from AI
             </Button>
           </div>
           <Textarea
@@ -85,13 +74,15 @@ const Summery = ({ isNext }) => {
             defaultValue={summery ? summery : resumeInfo?.summery}
           />
 
-          <div className="mt-4 flex  justify-end">
+          <div className="mt-4 flex justify-end">
             <Button disabled={loading} type="submit">
               {loading ? <LoaderCircle className="animate-spin" /> : "Save"}
             </Button>
           </div>
         </form>
       </div>
+
+      {/* ✅ Safe rendering only if array */}
       {aiGenSummery && (
         <div className=" p-2">
           <h2 className="font-semibold text-lg">Suggestions</h2>
@@ -107,6 +98,10 @@ const Summery = ({ isNext }) => {
       )}
     </div>
   );
+};
+
+Summery.propTypes = {
+  isNext: PropTypes.func.isRequired,
 };
 
 export default Summery;

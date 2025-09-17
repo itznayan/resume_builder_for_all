@@ -5,7 +5,6 @@ import RichTextEditor from "../RichTextEditor";
 import { ResumeInfoContext } from "@/context/ResumeInfoContext";
 import { toast } from "sonner";
 import { useParams } from "react-router-dom";
-import GlobalApi from "../../../../../service/GlobalApi";
 import { LoaderCircle } from "lucide-react";
 
 const formField = {
@@ -20,61 +19,51 @@ const formField = {
 
 const Experience = () => {
   const { resumeInfo, setResumeInfo } = useContext(ResumeInfoContext);
-  const [experienceList, setExperienceList] = useState([
-    {
-      formField,
-    },
-  ]);
+  const [experienceList, setExperienceList] = useState([{ ...formField }]);
   const params = useParams();
-  const [loading, setLoading] = useState();
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (index, event) => {
-    const newEntries = experienceList.slice();
+    const newEntries = [...experienceList];
     const { name, value } = event.target;
     newEntries[index][name] = value;
     setExperienceList(newEntries);
   };
 
   const AddNewExperience = () => {
-    setExperienceList([...experienceList, formField]);
-    toast("added successfully.");
+    setExperienceList([...experienceList, { ...formField }]);
+    toast("Experience added successfully.");
   };
 
   const removeExperience = () => {
-    setExperienceList((experienceList) => experienceList.slice(0, -1));
-    toast("Removed successfully.");
+    if (experienceList.length > 1) {
+      setExperienceList((prev) => prev.slice(0, -1));
+      toast("Experience removed successfully.");
+    }
   };
 
   const handleRichTextEditor = (e, name, index) => {
-    const newEntries = experienceList.slice();
+    const newEntries = [...experienceList];
     newEntries[index][name] = e.target.value;
     setExperienceList(newEntries);
   };
 
+  // Load initial experience if available
   useEffect(() => {
-    resumeInfo && setExperienceList(resumeInfo?.experience);
-  }, []);
+    if (resumeInfo?.experience && Array.isArray(resumeInfo.experience)) {
+      setExperienceList(resumeInfo.experience);
+    }
+  }, [resumeInfo]);
 
   const onSave = () => {
     setLoading(true);
-    const data = {
-      data: {
-        experience: experienceList.map(({ id, ...rest }) => rest),
-      },
-    };
-
-    // console.log(experienceList);
-    GlobalApi.UpdateResumeDetail(params?.resumeId, data).then(
-      (res) => {
-        console.log(res);
-        setLoading(false);
-        toast("Experience added successfully.");
-      },
-      (error) => {
-        setLoading(false);
-      }
-    );
+    setTimeout(() => {
+      setLoading(false);
+      toast("Experience saved successfully.");
+    }, 500);
   };
+
+  // Auto-save into context whenever list changes
   useEffect(() => {
     setResumeInfo({
       ...resumeInfo,
@@ -92,80 +81,70 @@ const Experience = () => {
             <div className="p-4" key={index}>
               <div className="grid grid-cols-2 gap-3 border p-3 rounded-lg">
                 <div>
-                  <label className="text-sm font-semibold" htmlFor="">
+                  <label className="text-sm font-semibold">
                     Position Title
                   </label>
                   <Input
                     name="title"
                     onChange={(event) => handleChange(index, event)}
                     className="mt-2"
-                    defaultValue={item?.title}
+                    value={item?.title}
                   />
                 </div>
 
                 <div>
-                  <label className="text-sm font-semibold" htmlFor="">
-                    Company Name
-                  </label>
+                  <label className="text-sm font-semibold">Company Name</label>
                   <Input
                     name="companyName"
                     onChange={(event) => handleChange(index, event)}
                     className="mt-2"
-                    defaultValue={item?.companyName}
+                    value={item?.companyName}
                   />
                 </div>
 
                 <div>
-                  <label className="text-sm font-semibold" htmlFor="">
-                    City
-                  </label>
+                  <label className="text-sm font-semibold">City</label>
                   <Input
                     name="city"
                     onChange={(event) => handleChange(index, event)}
                     className="mt-2"
-                    defaultValue={item?.city}
+                    value={item?.city}
                   />
                 </div>
 
                 <div>
-                  <label className="text-sm font-semibold" htmlFor="">
-                    State
-                  </label>
+                  <label className="text-sm font-semibold">State</label>
                   <Input
                     name="state"
                     onChange={(event) => handleChange(index, event)}
                     className="mt-2"
-                    defaultValue={item?.state}
+                    value={item?.state}
                   />
                 </div>
 
                 <div>
-                  <label className="text-sm font-semibold" htmlFor="">
-                    Start Date
-                  </label>
+                  <label className="text-sm font-semibold">Start Date</label>
                   <Input
                     type="date"
                     name="startDate"
                     onChange={(event) => handleChange(index, event)}
                     className="mt-2"
-                    defaultValue={item?.startDate}
+                    value={item?.startDate}
                   />
                 </div>
 
                 <div>
-                  <label className="text-sm font-semibold" htmlFor="">
-                    End Date
-                  </label>
+                  <label className="text-sm font-semibold">End Date</label>
                   <Input
                     type="date"
                     name="endDate"
                     onChange={(event) => handleChange(index, event)}
                     className="mt-2"
-                    defaultValue={item?.endDate}
+                    value={item?.endDate}
                   />
                 </div>
+
                 <div className="col-span-2">
-                  {/* Work Summery */}
                   <RichTextEditor
                     index={index}
                     defaultValue={item?.workSummery}
@@ -196,7 +175,7 @@ const Experience = () => {
               </Button>
             </div>
 
-            <Button disabled={loading} onClick={() => onSave()}>
+            <Button disabled={loading} onClick={onSave}>
               {loading ? <LoaderCircle className="animate-spin" /> : "Save"}
             </Button>
           </div>
